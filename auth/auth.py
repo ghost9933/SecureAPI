@@ -11,6 +11,7 @@ from models.user import User
 from schemas.token import TokenData
 import os
 from dotenv import load_dotenv
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 # Load environment variables from a .env file
 load_dotenv()
