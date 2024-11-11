@@ -1,14 +1,20 @@
+# docker-compose.yml
+
 version: '3.8'
 
 services:
   app:
     build: .
+    container_name: secureapi_app
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/app/data  # Mounts the relative 'data/' directory
+      - ./data:/app/data        # Mounts the host's 'data/' directory to the container
+      - ./logs:/app/logs        # Mounts the host's 'logs/' directory to the container
     environment:
       - DATABASE_URL=sqlite:///./data/phonebook.db
-      - SECRET_KEY=your_secret_key_here
-      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - SECRET_KEY=${SECRET_KEY}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    env_file:
+      - .env                      # Load environment variables from .env file
     restart: unless-stopped

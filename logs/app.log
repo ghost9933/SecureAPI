@@ -1,0 +1,9 @@
+2024-11-11 00:21:48,342 - INFO - secureapi - Application startup complete.
+2024-11-11 00:21:49,759 - INFO - secureapi - Application startup complete.
+2024-11-11 00:21:55,231 - INFO - secureapi - Application shutdown initiated.
+2024-11-11 06:22:15,740 - INFO - secureapi - Application startup complete.
+2024-11-11 06:23:05,569 - INFO - secureapi - Application shutdown initiated.
+{"asctime": "2024-11-11 06:26:57,232", "levelname": "INFO", "name": "secureapi", "message": "Application startup complete."}
+{"asctime": "2024-11-11 06:27:20,884", "levelname": "INFO", "name": "secureapi", "message": "Attempting to create user: a"}
+{"asctime": "2024-11-11 06:27:21,149", "levelname": "INFO", "name": "secureapi", "message": "User 'a' created successfully."}
+{"asctime": "2024-11-11 06:28:12,168", "levelname": "INFO", "name": "secureapi", "message": "Application shutdown initiated."}
