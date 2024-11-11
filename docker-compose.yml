@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data  # Mounts the relative 'data/' directory
+    environment:
+      - DATABASE_URL=sqlite:///./data/phonebook.db
+      - SECRET_KEY=your_secret_key_here
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    restart: unless-stopped

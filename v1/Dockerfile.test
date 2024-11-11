@@ -1,0 +1,19 @@
+# Dockerfile.test
+
+FROM python:3.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install pip requirements
+COPY requirements.txt .
+RUN python -m pip install --upgrade pip
+RUN python -m pip install -r requirements.txt
+
+WORKDIR /app
+COPY . /app
+
+# Install pytest
+RUN python -m pip install pytest
+
+CMD ["pytest","test.py"]
