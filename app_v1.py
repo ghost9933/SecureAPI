@@ -82,103 +82,19 @@ class PhoneBookEntry(BaseModel):
 
     @validator('name')
     def validate_name(cls, value):
-    
-        # Define allowed characters within names or single initials with an optional dot
-        name_part = r"(?:[A-Za-zÀ-ÖØ-öø-ÿ'’‘\-]+|[A-Za-z]\.)"
-        
-        # Define patterns for valid formats
-        single_word = fr"^{name_part}$"  # Single name (e.g., "Cher")
-        two_words = fr"^{name_part}\s+{name_part}$"  # First Last (e.g., "Bruce Schneier")
-        three_words = fr"^{name_part}\s+{name_part}\s+{name_part}$"  # First Middle Last or Last, First Middle
-        last_comma_first_middle = fr"^{name_part},\s+{name_part}(?:\s+{name_part})?$"  # Last, First [Middle]
-
-        # Combined pattern
-        pattern = fr"^(?:{single_word}|{two_words}|{three_words}|{last_comma_first_middle})$"
-
-        # Check if the input matches one of the valid patterns
-        if not re.match(pattern, value, flags=re.UNICODE):
+        # Regex for names like "First Last", "Last, First", "First Middle Last"
+        pattern = r"^([a-zA-Z]+([ '-][a-zA-Z]+)*)(, [a-zA-Z]+)?$"
+        if not re.match(pattern, value):
             raise ValueError("Invalid name format")
-
-        # Ensure no multiple hyphens or apostrophes within a single part of the name
-        for part in re.split(r"[\s,]+", value):
-            # Disallow consecutive special characters
-            if re.search(r"[’'‘\-]{2,}", part):
-                raise ValueError("Invalid name format")
-            
-            # Allow at most one hyphen or apostrophe per name part
-            if len(re.findall(r"[’'‘\-]", part)) > 1:
-                raise ValueError("Invalid name format")
-
-        # Check the total number of name components (to restrict to max 3 words)
-        name_parts = re.split(r"[\s,]+", value)
-        if len(name_parts) > 3:
-            raise ValueError("Invalid name format")
-
         return value.strip()
 
     @validator('phone_number')
     def validate_phone_number(cls, value):
-            # Convert to string and strip leading/trailing whitespace
-        phone_str = str(value).strip()
-
-        # a. Check for presence of script tags (basic XSS protection)
-        if re.search(r"<\s*script.*?>", phone_str, re.IGNORECASE):
-            raise ValueError("Invalid phone number: Contains script tags")
-
-        # b. Reject if any alphabetic characters are present
-        if re.search(r"[A-Za-z]", phone_str):
-            raise ValueError("Invalid phone number: Contains alphabetic characters")
-
-        # c. Reject phone numbers containing disallowed characters
-        if re.search(r"[^\d\s\-\.\+\(\)]", phone_str):
-            raise ValueError("Invalid phone number: Contains disallowed characters")
-
-        # d. Reject phone numbers with extensions or additional text
-        if re.search(r"(ext|x|extension)", phone_str, re.IGNORECASE):
-            raise ValueError("Invalid phone number: Contains extension")
-
-        # e. Check for continuous 10-digit numbers without separators
-        if re.fullmatch(r"\d{10}", phone_str):
-            raise ValueError("Invalid phone number: Unformatted 10-digit sequence")
-
-        # Define regex patterns for valid phone number formats
-        patterns = [
-            r"^\d{5}$",  # 5-digit numbers
-            r"^\d{3}-\d{4}$",  # 7-digit numbers with hyphen
-            r"^\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}$",  # North American numbers with area code
-            r"^(?:\+1\s?|1\s?|011\s\d{1,3}\s?)\(?\d{2,3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$",  # International with prefix
-            r"^\+(?!01\b)\d{1,3}\s?\(?\d{2,3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$",  # International with "+"
-            r"^\d{5}[-.\s]?\d{5}$"  # Two groups of 5 digits
-        ]
-
-        # Compile the patterns for efficiency
-        compiled_patterns = [re.compile(pattern) for pattern in patterns]
-
-        # Check if the phone number matches any of the valid patterns
-        for pattern in compiled_patterns:
-            if pattern.fullmatch(phone_str):
-                # Additional checks based on specific rules
-                if phone_str.startswith('('):
-                    area_code = re.findall(r"\((\d{3})\)", phone_str)
-                    if area_code and area_code[0].startswith(('0', '1')):
-                        raise ValueError("Invalid phone number: Area code cannot start with '0' or '1'")
-
-                if phone_str.startswith('+'):
-                    country_code = re.findall(r"^\+(\d{1,3})", phone_str)
-                    if country_code and country_code[0] == '01':
-                        raise ValueError("Invalid phone number: Country code cannot be '01'")
-
-                invalid_area_codes = ['000', '001']
-                if phone_str.startswith('('):
-                    area_code = re.findall(r"\((\d{3})\)", phone_str)
-                    if area_code and area_code[0] in invalid_area_codes:
-                        raise ValueError("Invalid phone number: Contains invalid area code")
-
-                # If all checks passed, return the validated phone number
-                return phone_str
-
-        # If none of the patterns matched
-        raise ValueError("Invalid phone number format")
+        # Regex for international phone numbers with optional "+" and country code
+        pattern = r"^\+?[1-9]\d{1,14}$"
+        if not re.match(pattern, value):
+            raise ValueError("Invalid phone number format")
+        return value.strip()
 
     class Config:
         orm_mode = True  # Enable ORM mode
