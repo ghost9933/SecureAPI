@@ -13,18 +13,18 @@ PASSWORD = "password123"
 
 # Define the test cases with the correct field names
 test_cases = [
-    {"name": "Bruce Schneier", "phone_number": "+111222", "expected_status": 200, "description": "Acceptable input: Bruce Schneier"},
-    {"name": "Schneier, Bruce", "phone_number": "+111222", "expected_status": 200, "description": "Acceptable input: Schneier, Bruce"},
-    {"name": "Schneier, Bruce Wayne", "phone_number": "+111222", "expected_status": 200, "description": "Acceptable input: Schneier, Bruce Wayne"},
-    {"name": "O’Malley, John F.", "phone_number": "+111222", "expected_status": 200, "description": "Acceptable input: O’Malley, John F."},
-    {"name": "John O’Malley-Smith", "phone_number": "+111222", "expected_status": 200, "description": "Acceptable input: John O’Malley-Smith"},
-    {"name": "Cher", "phone_number": "+111222", "expected_status": 200, "description": "Acceptable input: Cher"},
-    {"name": "Ron O’’Henry", "phone_number": "+111222", "expected_status": 400, "description": "Unacceptable input: Ron O’’Henry"},
-    {"name": "Ron O’Henry-Smith-Barnes", "phone_number": "+111222", "expected_status": 400, "description": "Unacceptable input: Ron O’Henry-Smith-Barnes"},
-    {"name": "L33t Hacker", "phone_number": "+111222", "expected_status": 400, "description": "Unacceptable input: L33t Hacker"},
-    {"name": "<Script>alert(\"XSS\")</Script>", "phone_number": "+111222", "expected_status": 400, "description": "Unacceptable input: <Script>alert(\"XSS\")</Script>"},
-    {"name": "Brad Everett Samuel Smith", "phone_number": "+111222", "expected_status": 400, "description": "Unacceptable input: Brad Everett Samuel Smith"},
-    {"name": "select * from users;", "phone_number": "+111222", "expected_status": 400, "description": "Unacceptable input: select * from users;"}
+    {"name": "Bruce Schneier", "phone_number": "(703)111-2121", "expected_status": 200, "description": "Acceptable input: Bruce Schneier"},
+    {"name": "Schneier, Bruce", "phone_number": "(703)111-2121", "expected_status": 200, "description": "Acceptable input: Schneier, Bruce"},
+    {"name": "Schneier, Bruce Wayne", "phone_number": "(703)111-2121", "expected_status": 200, "description": "Acceptable input: Schneier, Bruce Wayne"},
+    {"name": "O’Malley, John F.", "phone_number": "(703)111-2121", "expected_status": 200, "description": "Acceptable input: O’Malley, John F."},
+    {"name": "John O’Malley-Smith", "phone_number": "(703)111-2121", "expected_status": 200, "description": "Acceptable input: John O’Malley-Smith"},
+    {"name": "Cher", "phone_number": "(703)111-2121", "expected_status": 200, "description": "Acceptable input: Cher"},
+    {"name": "Ron O’’Henry", "phone_number": "(703)111-2121", "expected_status": 400, "description": "Unacceptable input: Ron O’’Henry"},
+    {"name": "Ron O’Henry-Smith-Barnes", "phone_number": "(703)111-2121", "expected_status": 400, "description": "Unacceptable input: Ron O’Henry-Smith-Barnes"},
+    {"name": "L33t Hacker", "phone_number": "(703)111-2121", "expected_status": 400, "description": "Unacceptable input: L33t Hacker"},
+    {"name": "<Script>alert(\"XSS\")</Script>", "phone_number": "(703)111-2121", "expected_status": 400, "description": "Unacceptable input: <Script>alert(\"XSS\")</Script>"},
+    {"name": "Brad Everett Samuel Smith", "phone_number": "(703)111-2121", "expected_status": 400, "description": "Unacceptable input: Brad Everett Samuel Smith"},
+    {"name": "select * from users;", "phone_number": "(703)111-2121", "expected_status": 400, "description": "Unacceptable input: select * from users;"}
 ]
 
 # Function to get access token with debugging output

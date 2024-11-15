@@ -82,43 +82,81 @@ class PhoneBookEntry(BaseModel):
 
     @validator('name')
     def validate_name(cls, value):
+        # Convert name to lowercase once for efficiency
+        lower_name = value.lower()
+
+        # Check for script tags or reserved keywords
+        if "<script>" in lower_name or "string" in lower_name:
+            raise ValueError("Invalid name format: contains prohibited substrings.")
+
+        # Remove leading/trailing whitespace and replace multiple spaces with a single space
+        # Use 'value' instead of 'name' since 'name' hasn't been defined yet
+        name = re.sub(r'\s+', ' ', value.strip())
+
+        # Compile the regular expression for acceptable characters
+        # Includes both straight (') and curly (’) apostrophes, hyphens (-), commas (,), and periods (.)
+        acceptable_chars = re.compile(r"^[a-zA-Z \-,'’\.]+$")
+
+        # Check if the entire name matches the pattern (no invalid special characters)
+        if not acceptable_chars.fullmatch(name):
+            raise ValueError("Invalid name format: contains invalid characters.")
+
+        # Split the name into words
+        words = name.split()
+
+        # Check for maximum number of words
+        if len(words) > 3:
+            raise ValueError("Invalid name format: exceeds maximum number of words (3).")
+
+        # Check for single occurrences of special characters per word segment
+        for word in words:
+            if any(word.count(char) > 1 for char in ["-", "'", "’", ","]):
+                raise ValueError("Invalid name format: multiple special characters in a word.")
+
+        # Name validation successful
+        return name   
     
-        # Define allowed characters within names or single initials with an optional dot
-        name_part = r"(?:[A-Za-zÀ-ÖØ-öø-ÿ'’‘\-]+|[A-Za-z]\.)"
+    
+    
+     # Return the cleaned and validated name
+
+    
+        # # Define allowed characters within names or single initials with an optional dot
+        # name_part = r"(?:[A-Za-zÀ-ÖØ-öø-ÿ'’‘\-]+|[A-Za-z]\.)"
         
-        # Define patterns for valid formats
-        single_word = fr"^{name_part}$"  # Single name (e.g., "Cher")
-        two_words = fr"^{name_part}\s+{name_part}$"  # First Last (e.g., "Bruce Schneier")
-        three_words = fr"^{name_part}\s+{name_part}\s+{name_part}$"  # First Middle Last or Last, First Middle
-        last_comma_first_middle = fr"^{name_part},\s+{name_part}(?:\s+{name_part})?$"  # Last, First [Middle]
+        # # Define patterns for valid formats
+        # single_word = fr"^{name_part}$"  # Single name (e.g., "Cher")
+        # two_words = fr"^{name_part}\s+{name_part}$"  # First Last (e.g., "Bruce Schneier")
+        # three_words = fr"^{name_part}\s+{name_part}\s+{name_part}$"  # First Middle Last or Last, First Middle
+        # last_comma_first_middle = fr"^{name_part},\s+{name_part}(?:\s+{name_part})?$"  # Last, First [Middle]
 
-        # Combined pattern
-        pattern = fr"^(?:{single_word}|{two_words}|{three_words}|{last_comma_first_middle})$"
+        # # Combined pattern
+        # pattern = fr"^(?:{single_word}|{two_words}|{three_words}|{last_comma_first_middle})$"
 
-        # Check if the input matches one of the valid patterns
-        if not re.match(pattern, value, flags=re.UNICODE):
-            raise ValueError("Invalid name format")
+        # # Check if the input matches one of the valid patterns
+        # if not re.match(pattern, value, flags=re.UNICODE):
+        #     raise ValueError("Invalid name format")
 
-        # Ensure no multiple hyphens or apostrophes within a single part of the name
-        for part in re.split(r"[\s,]+", value):
-            # Disallow consecutive special characters
-            if re.search(r"[’'‘\-]{2,}", part):
-                raise ValueError("Invalid name format")
+        # # Ensure no multiple hyphens or apostrophes within a single part of the name
+        # for part in re.split(r"[\s,]+", value):
+        #     # Disallow consecutive special characters
+        #     if re.search(r"[’'‘\-]{2,}", part):
+        #         raise ValueError("Invalid name format")
             
-            # Allow at most one hyphen or apostrophe per name part
-            if len(re.findall(r"[’'‘\-]", part)) > 1:
-                raise ValueError("Invalid name format")
+        #     # Allow at most one hyphen or apostrophe per name part
+        #     if len(re.findall(r"[’'‘\-]", part)) > 1:
+        #         raise ValueError("Invalid name format")
 
-        # Check the total number of name components (to restrict to max 3 words)
-        name_parts = re.split(r"[\s,]+", value)
-        if len(name_parts) > 3:
-            raise ValueError("Invalid name format")
+        # # Check the total number of name components (to restrict to max 3 words)
+        # name_parts = re.split(r"[\s,]+", value)
+        # if len(name_parts) > 3:
+        #     raise ValueError("Invalid name format")
 
-        return value.strip()
+        # return value.strip()
 
     @validator('phone_number')
     def validate_phone_number(cls, value):
-            # Convert to string and strip leading/trailing whitespace
+
         phone_str = str(value).strip()
 
         # a. Check for presence of script tags (basic XSS protection)
