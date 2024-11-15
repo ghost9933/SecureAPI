@@ -1,0 +1,29 @@
+# Use an official Python runtime as a base image
+FROM python:3.9-slim
+
+# Set environment variables to prevent Python from writing .pyc files and buffer stdout/stderr
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file first for caching
+COPY requirements.txt .
+
+# Upgrade pip and install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the entire project into the Docker image
+COPY . .
+
+# Ensure the test scripts have permissions
+RUN chmod -R 755 /app/tests
+
+# Command to run all test scripts in sequence
+CMD ["sh", "-c", "python /app/tests/creds_tests.py && \
+                  python /app/tests/name_test.py && \
+                  python /app/tests/phone_test.py && \
+                  python /app/tests/unit_tests.py && \
+                  python /app/tests/cleanDB.py"]

@@ -1,311 +1,112 @@
 
-**Explanation of Directories:**
-```
-SecureAPI/
-├── app.py
-├── models/
-│   ├── __init__.py
-│   ├── user.py
-│   ├── phonebook.py
-│   └── audit_log.py
-├── schemas/
-│   ├── __init__.py
-│   ├── user.py
-│   ├── phonebook.py
-│   └── token.py
-├── database.py
-├── auth/
-│   ├── __init__.py
-│   └── auth.py
-├── routers/
-│   ├── __init__.py
-│   ├── users.py
-│   ├── phonebook.py
-│   └── audit_logs.py
-├── utils/
-│   ├── __init__.py
-│   └── utils.py
-├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-├── .env
-└── README.md
-```
+# SecureAPI Application
 
-**Files:**
-
-- **`app.py`**: The main entry point of your FastAPI application.
-- **`models/`**: Contains SQLAlchemy ORM models.
-- **`schemas/`**: Contains Pydantic models (data validation and serialization).
-- **`database.py`**: Handles database connection and session management.
-- **`auth/`**: Manages authentication-related functionalities.
-- **`routers/`**: Contains API route handlers grouped by functionality.
-- **`utils/`**: Contains utility functions and helpers.
-- **`requirements.txt`**: Lists Python dependencies.
-- **`Dockerfile`** & **`docker-compose.yml`**: For containerization and orchestration.
-- **`.env`**: Stores environment variables.
-- **`README.md`**: Project documentation.
+This repository contains a Python application deployed with Docker, utilizing **Uvicorn** and **Python 3.9-slim**. It provides robust features for secure API interactions, including authentication, phone number validation, and name validation to mitigate XSS vulnerabilities.
 
 ---
 
-# Secure PhoneBook API
-
-A secure and modular FastAPI application for managing a phonebook with user authentication and audit logging.
-
 ## Features
 
-- **User Authentication**: JWT-based authentication with role-based access control (`Read` and `Read/Write`).
-- **CRUD Operations**: Add, list, and delete phonebook entries.
-- **Audit Logging**: Track user actions for auditing purposes.
-- **Dockerized**: Easily deployable using Docker and Docker Compose.
-- **Environment Variables**: Securely manage configurations using a `.env` file.
+- **Authentication and Authorization**: Token-based user role management.
+- **Phone Number Validation**: Ensures correct format and prevents input errors.
+- **Name Validation**: Mitigates security risks like XSS.
+- **Permission Handling**: Correctly distinguishes read and write permissions.
+- **Database Integrity**: Resets and cleans up the database after each test.
 
-## Getting Started
+---
 
-### Prerequisites
+## Prerequisites
 
-- [Python 3.9+](https://www.python.org/downloads/)
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+Before running the application, ensure you have the following installed:
 
-### Installation
+- Docker and Docker Compose
+- Python 3.9+ (for local environment testing)
+- `pip` (Python package manager)
 
-1. **Clone the Repository:**
+---
 
+## Setup Instructions
+
+1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/SecureAPI.git
-   cd SecureAPI
+   git clone <repository-url>
+   cd <repository-folder>
    ```
 
-2. **Create and Activate Virtual Environment:**
-
+2. **Create a Python Virtual Environment**
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Install Dependencies:**
+3. **Activate the Virtual Environment**
+   - On Windows (Command Prompt):
+     ```bash
+     venv\Scripts\activate
+     ```
+   - On Windows (PowerShell):
+     ```bash
+     .\venv\Scripts\Activate.ps1
+     ```
+   - On Linux/MacOS:
+     ```bash
+     source venv/bin/activate
+     ```
 
+4. **Install Dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configure Environment Variables:**
-
-   Create a `.env` file in the project root:
-
-   ```env
-   SECRET_KEY=your_secure_secret_key_here
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
-   DATABASE_URL=sqlite:///./data/phonebook.db
-   ```
-
-5. **Run the Application:**
-
-   ```bash
-   uvicorn app:app --reload
-   ```
-
-   Access the API documentation at [http://localhost:8000/docs](http://localhost:8000/docs).
-
-### Using Docker
-
-1. **Build the Docker Image:**
-
+5. **Build the Docker Images**
    ```bash
    docker-compose build
    ```
 
-2. **Run the Container:**
-
+6. **Run the Application**
    ```bash
    docker-compose up -d
    ```
 
-3. **Access the Application:**
+   - The application will run on **port 8000** by default. Update the `docker-compose.yml` file if the port is unavailable.
 
-   Visit [http://localhost:8000/docs](http://localhost:8000/docs) to interact with the API.
+---
 
-4. **Stopping the Container:**
+## Testing Instructions
 
+The repository includes automated test scripts to validate the application's functionality.
+
+### Run Tests with Docker
+
+1. **Token Generation and Invalidations**
    ```bash
-   docker-compose down
+   docker exec -it secureapi_app python /app/tests/creds_tests.py
    ```
 
-## API Endpoints
-
-### Authentication
-
-- **Create User**
-
-  - **URL:** `/users/`
-  - **Method:** `POST`
-  - **Body:**
-    ```json
-    {
-      "username": "user1",
-      "password": "securepassword",
-      "role": "Read/Write"
-    }
-    ```
-  - **Response:**
-    ```json
-    {
-      "access_token": "jwt_token_here",
-      "token_type": "bearer"
-    }
-    ```
-
-- **Login**
-
-  - **URL:** `/token`
-  - **Method:** `POST`
-  - **Form Data:**
-    - `username`: `user1`
-    - `password`: `securepassword`
-  - **Response:**
-    ```json
-    {
-      "access_token": "jwt_token_here",
-      "token_type": "bearer"
-    }
-    ```
-
-### PhoneBook
-
-- **Add Entry**
-
-  - **URL:** `/PhoneBook/add`
-  - **Method:** `POST`
-  - **Headers:** `Authorization: Bearer <token>`
-  - **Body:**
-    ```json
-    {
-      "name": "John Doe",
-      "phone_number": "+1234567890"
-    }
-    ```
-  - **Response:**
-    ```json
-    {
-      "name": "John Doe",
-      "phone_number": "+1234567890"
-    }
-    ```
-
-- **List Entries**
-
-  - **URL:** `/PhoneBook/list`
-  - **Method:** `GET`
-  - **Headers:** `Authorization: Bearer <token>`
-  - **Response:**
-    ```json
-    [
-      {
-        "name": "John Doe",
-        "phone_number": "+1234567890"
-      },
-      {
-        "name": "Jane Smith",
-        "phone_number": "+0987654321"
-      }
-    ]
-    ```
-
-- **Delete by Name**
-
-  - **URL:** `/PhoneBook/deleteByName`
-  - **Method:** `PUT`
-  - **Headers:** `Authorization: Bearer <token>`
-  - **Query Params:** `name=John%20Doe`
-  - **Response:**
-    ```json
-    {
-      "message": "Deleted John Doe from the phone book"
-    }
-    ```
-
-- **Delete by Number**
-
-  - **URL:** `/PhoneBook/deleteByNumber`
-  - **Method:** `PUT`
-  - **Headers:** `Authorization: Bearer <token>`
-  - **Query Params:** `phone_number=+1234567890`
-  - **Response:**
-    ```json
-    {
-      "message": "Deleted +1234567890 from the phone book"
-    }
-    ```
-
-### Audit Logs
-
-- **Get Audit Logs**
-
-  - **URL:** `/audit-logs/`
-  - **Method:** `GET`
-  - **Headers:** `Authorization: Bearer <token>`
-  - **Response:**
-    ```json
-    [
-      {
-        "id": 1,
-        "user_id": 1,
-        "action": "add",
-        "timestamp": "2023-11-10T12:34:56.789Z",
-        "details": "Added John Doe"
-      },
-      {
-        "id": 2,
-        "user_id": 1,
-        "action": "list",
-        "timestamp": "2023-11-10T12:35:00.123Z",
-        "details": "Listed phone book entries"
-      }
-    ]
-    ```
-
-## **4. Running and Testing the Modularized Application**
-
-### **A. Running Locally**
-
-1. **Ensure the `data/` Directory Exists:**
-
+2. **Name Validation Tests**
    ```bash
-   mkdir data
+   docker exec -it secureapi_app python /app/tests/name_test.py
    ```
 
-2. **Run the Application:**
-
+3. **Phone Number Validation Tests**
    ```bash
-   uvicorn app:app --reload
+   docker exec -it secureapi_app python /app/tests/phone_test.py
    ```
 
-3. **Access API Documentation:**
-
-   Navigate to [http://localhost:8000/docs](http://localhost:8000/docs) to interact with the API using Swagger UI.
-
-### **B. Running with Docker**
-
-1. **Build the Docker Image:**
-
+4. **Unit Tests for All Endpoints**
    ```bash
-   docker-compose build
+   docker exec -it secureapi_app python /app/tests/unit_tests.py
    ```
 
-2. **Start the Docker Container:**
+---
 
-   ```bash
-   docker-compose up -d
-   ```
+## Troubleshooting
 
-3. **Access the Application:**
+- **Port 8000 Unavailable**: 
+  Modify the `docker-compose.yml` file to change the port mapping, e.g., `- "8001:8000"`, and restart the application.
 
-   Visit [http://localhost:8000/docs](http://localhost:8000/docs).
+- **Database Issues**:
+  Ensure database services are correctly initialized and running in the `docker-compose.yml`.
 
-4. **Verify Database Persistence:**
+- **Environment Activation**:
+  If the virtual environment fails to activate, check your terminal's permissions or use an elevated terminal.
 
-   - Add a phonebook entry.
-   - Stop the Docker container: `docker-compose down`.
-   - Start the container again: `docker-compose up -d`.
-   - List entries to ensure data persists.

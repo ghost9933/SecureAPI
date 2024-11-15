@@ -7,7 +7,7 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 
+docker-compose build 
 
-pip install uvicorn
+docker-compose up -d
 
-uvicorn --version
