@@ -270,7 +270,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 # Auth dependencies
 async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=status.HTTP_400_BAD_REQUEST,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
@@ -290,12 +290,12 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
 
 async def read_permission(current_user: User = Depends(get_current_user)):
     if current_user.role not in ["Read", "Read/Write"]:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Operation not permitted")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Operation not permitted")
     return current_user
 
 async def write_permission(current_user: User = Depends(get_current_user)):
     if current_user.role != "Read/Write":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Operation not permitted")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Operation not permitted")
     return current_user
 
 # Audit logging
